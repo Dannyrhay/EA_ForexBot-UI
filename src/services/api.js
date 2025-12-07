@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+// Use Cloudflare Tunnel in production, local proxy in development
+const API_BASE_URL = import.meta.env.PROD
+    ? 'https://api.tradepilot.trade/api'
+    : '/api';
+
 const api = axios.create({
-    baseURL: '/api', // Proxy handles the target
+    baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
