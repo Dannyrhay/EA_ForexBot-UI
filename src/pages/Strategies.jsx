@@ -49,11 +49,11 @@ export default function Strategies() {
     if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading strategies...</div>;
 
     return (
-        <div className="space-y-6 max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
+        <div className="space-y-6 max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Strategy Insights</h2>
-                    <p className="text-muted-foreground mt-1">Manage and monitor your active trading algorithms.</p>
+                    <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Strategy Insights</h2>
+                    <p className="text-muted-foreground mt-1 text-sm sm:text-base">Manage and monitor your active trading algorithms.</p>
                 </div>
                 <div className="flex gap-2">
                     <button className="p-2 rounded-md hover:bg-accent transition-colors">
@@ -62,7 +62,70 @@ export default function Strategies() {
                 </div>
             </div>
 
-            <div className="overflow-x-auto pb-4">
+            {/* Mobile Card Layout */}
+            <div className="lg:hidden space-y-4">
+                {strategies?.map((strategy) => (
+                    <Card key={strategy.id} className={`border transition-all duration-200 ${strategy.enabled ? 'bg-card' : 'bg-muted/30 opacity-75'}`}>
+                        <CardContent className="p-4">
+                            <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1 min-w-0">
+                                    <div className="font-bold text-lg truncate">{strategy.name}</div>
+                                    <div className="text-xs text-muted-foreground">{strategy.totalTrades} trades executed</div>
+                                </div>
+                                <Switch
+                                    checked={strategy.enabled}
+                                    onCheckedChange={() => handleToggle(strategy.id, strategy.enabled)}
+                                />
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-3 mb-3">
+                                <div className={`flex items-center text-lg font-bold ${strategy.winRate >= 50 ? 'text-green-500' : 'text-red-500'}`}>
+                                    {strategy.winRate}%
+                                    {strategy.winRate >= 50 ?
+                                        <TrendingUp className="w-4 h-4 ml-1 text-green-500" /> :
+                                        <TrendingDown className="w-4 h-4 ml-1 text-red-500" />
+                                    }
+                                </div>
+                                {getStatusBadge(strategy)}
+                            </div>
+
+                            {/* Trend Sparkline */}
+                            <div className="h-[40px] w-full">
+                                {strategy.recentResults && strategy.recentResults.length > 0 ? (
+                                    <svg className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                                        <defs>
+                                            <linearGradient id={`gradient-mobile-${strategy.id}`} x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor={strategy.winRate >= 50 ? "#22c55e" : "#ef4444"} stopOpacity="0.5" />
+                                                <stop offset="100%" stopColor={strategy.winRate >= 50 ? "#22c55e" : "#ef4444"} stopOpacity="0" />
+                                            </linearGradient>
+                                        </defs>
+                                        <path
+                                            d={`M0,${40 - (Math.max(0, strategy.recentResults[0] + 1) * 20)} ${strategy.recentResults.map((r, i) => `L${(i / (strategy.recentResults.length - 1)) * 100}%,${40 - (Math.max(0, r + 1) * 20)}`).join(' ')}`}
+                                            fill="none"
+                                            stroke={strategy.winRate >= 50 ? "#22c55e" : "#ef4444"}
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                        <path
+                                            d={`M0,${40 - (Math.max(0, strategy.recentResults[0] + 1) * 20)} ${strategy.recentResults.map((r, i) => `L${(i / (strategy.recentResults.length - 1)) * 100}%,${40 - (Math.max(0, r + 1) * 20)}`).join(' ')} V40 H0 Z`}
+                                            fill={`url(#gradient-mobile-${strategy.id})`}
+                                            stroke="none"
+                                        />
+                                    </svg>
+                                ) : (
+                                    <div className="h-full w-full flex items-center justify-center text-xs text-muted-foreground border border-dashed rounded opacity-50">
+                                        No Data
+                                    </div>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+
+            {/* Desktop Table Layout */}
+            <div className="hidden lg:block overflow-x-auto pb-4">
                 <div className="min-w-[800px]">
                     {/* Table Header */}
                     <div className="grid grid-cols-12 gap-4 px-6 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -151,7 +214,7 @@ export default function Strategies() {
                 </div>
             </div>
 
-            <div className="mt-8 flex justify-between text-xs text-muted-foreground px-2">
+            <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between gap-2 text-xs text-muted-foreground px-2">
                 <div>Last updated: Just now</div>
                 <div>Total Active Strategies: {strategies?.filter(s => s.enabled).length || 0}</div>
             </div>
