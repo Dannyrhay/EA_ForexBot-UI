@@ -57,6 +57,22 @@ export const updateConfig = async (config) => {
     return response.data;
 };
 
+// Equity curve data for the Dashboard chart
+export const fetchEquityCurve = async (limit = 50) => {
+    const response = await api.get(`/equity_curve?limit=${limit}`);
+    return response.data;
+};
 
+// Bot control functions
+export const startBot = async () => {
+    const response = await api.post('/control/start_bot');
+    return response.data;
+};
+
+export const stopBot = async () => {
+    const response = await api.post('/control/stop_bot');
+    return response.data;
+};
 
 export default api;
+

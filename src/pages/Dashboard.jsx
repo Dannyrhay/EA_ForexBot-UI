@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowUpRight, DollarSign, Activity, Percent, Play, Square, TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchAccountInfo, fetchSignals, fetchStrategyPerformance } from "@/services/api";
+import { fetchAccountInfo, fetchSignals, fetchStrategyPerformance, fetchEquityCurve, startBot, stopBot } from "@/services/api";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Dashboard() {
@@ -25,19 +25,16 @@ export default function Dashboard() {
 
     const { data: equityData } = useQuery({
         queryKey: ['equityCurve'],
-        queryFn: async () => {
-            const res = await fetch('/api/equity_curve?limit=50');
-            return res.json();
-        },
+        queryFn: () => fetchEquityCurve(50),
         refetchInterval: 60000,
     });
 
     const handleStartBot = async () => {
-        try { await fetch('/api/control/start_bot', { method: 'POST' }); } catch (e) { console.error(e); }
+        try { await startBot(); } catch (e) { console.error(e); }
     };
 
     const handleStopBot = async () => {
-        try { await fetch('/api/control/stop_bot', { method: 'POST' }); } catch (e) { console.error(e); }
+        try { await stopBot(); } catch (e) { console.error(e); }
     };
 
     // Helper for circular progress
