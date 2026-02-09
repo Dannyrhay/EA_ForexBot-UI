@@ -1,9 +1,7 @@
 import axios from 'axios';
 
-// Use Cloudflare Tunnel in production, local proxy in development
-const API_BASE_URL = import.meta.env.PROD
-    ? 'https://api.tradepilot.trade/api'
-    : '/api';
+// Always use relative path since Flask serves both frontend and API
+const API_BASE_URL = '/api';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
